@@ -1,6 +1,6 @@
 import DecoEnco.Encriptar;
 import Exepciones.EligioMalElIdiomaExcepcion;
-import Texto.Letras;
+import EntradasSalidas.Letras;
 
 import java.util.Scanner;
 
@@ -8,7 +8,6 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Letras letras = new Letras();
-        Encriptar encriptar = new Encriptar();
 
         System.out.println("Tenemos a su disponibilidad dos idiomas para la encriptacion: Español e ingles.\nCuál prefiere?");
         System.out.println("We have 2 lenguages available to encode: spanish and english. \nWhich one do you prefer?");
@@ -43,6 +42,7 @@ public class Main {
             System.out.println("¿Qué desplazamiento prefieres?");
             int desplazamiento = scanner.nextInt();
             letras.setDesplazamiento(desplazamiento);
+            letras.moviemiento(Letras.LETRASESPAÑOL);
             //encriptar.encriptacion();
         } else if(decoOEnco.toLowerCase().contains("decode")){
 
