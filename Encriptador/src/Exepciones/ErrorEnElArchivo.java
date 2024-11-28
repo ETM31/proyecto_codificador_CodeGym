@@ -1,9 +1,8 @@
 package Exepciones;
 
-import java.io.IOException;
 
 public class ErrorEnElArchivo extends Throwable {
-    public ErrorEnElArchivo(IOException e) {
-        super(e);
+    public ErrorEnElArchivo() {
+        throw new RuntimeException("Error al leer el archivo");
     }
 }

@@ -43,6 +43,5 @@ public class Letras {
             letrasConvertidas[i] = lista[desplazamiento];
             desplazamiento++;
         }
-        //System.out.println(letrasConvertidas);// Para comprobar si hace los corrimientos o no
     }
 }

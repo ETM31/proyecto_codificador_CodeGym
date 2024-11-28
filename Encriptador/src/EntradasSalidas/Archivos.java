@@ -5,45 +5,97 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
- // YA HACE LA CONVERSION, AHORA POR FAVOR HAZ QUE NO SIEMPRE ESTE ESCRIBIENDO O LEYENDO
-// Debes ya de hacer que este busine trabaje como quieres, debes pasar lo que te da el StringBuilder a un .txt y ya tendrás el encriptador completo
 // Te falta el desencriptador, pero ya mero we, ánimo, sí lo sacas
 /*
-Debes hallar la forma de que se conecte con letras y sus funciones, al ser una clase hija no deberías tener problemas
-porque puedes acceder a las variables y métodos de la padre, solo debes llamarla en el lugar correcto y con los datos
-correctos, si necesitas hacer pruebas edita el deplazamiento en Letras, modificas en el contructor
+Ya quedó el codificador, ya incluso crea archivos con el texto codificado. Te falta el deco que npi de cómo hacerlo
+y te falta tmb manejo de excepciones en algunos lugares, ya haz hecho gran parte de eso, pero aún así, ya sabes que al
+final harás ll tu código para que te haga todos los errores que pueda para optimizar el código
  */
 
 public class Archivos extends Letras{
     StringBuilder stringBuilder = new StringBuilder();
+    Path path;
+    String camino = null;
 
-     public StringBuilder trabajarArchivo() throws IOException {
-        // Define la ruta del archivo
-        Path path = Path.of("c:/Usuarios/77593/Documentos/readme.txt");
 
+    public Archivos() {
+    }
+
+    public void crearDirectorio(String direccion) {
+        this.camino = direccion;
+        path = Path.of(camino);// pongo el camino que nos interesa usar
         // Crea los directorios si no existen
         if (!Files.exists(path.getParent())) {
-            Files.createDirectories(path.getParent());
+            try {
+                Files.createDirectories(path.getParent());
+            } catch (IOException e) {
+                throw new RuntimeException("Error al generar el directorio del archivo"+e);
+            }
             System.out.println("Directorios creados: " + path.getParent());
+        } else {
+            System.out.println("El archivo ya existe");
         }
 
+        crearArchivo(path);
+
+    }
+
+    public void crearArchivo(Path path){
         // Crea el archivo si no existe
         if (!Files.exists(path)) {
-            Files.createFile(path);
+            try {
+                Files.createFile(path);
+            } catch (IOException e) {
+                throw new RuntimeException("Error al crear el archivo"+e);
+            }
             System.out.println("Archivo creado: " + path);
         } else {
             System.out.println("El archivo ya existe: " + path);
         }
-        /*
+    }
 
+    public Path crearDireccionEncriptado(/*Path direccion*/){
+        Path padreDirectorio = path.getParent();
+        Path nombreArchivo = path.getFileName();
+        String nombreArchivoString = nombreArchivo.toString(); // para poder manipular el nombre
+        int indexTipoArchivo = nombreArchivoString.lastIndexOf("."); // identifico el tipo de archivo
+        String nombreArchivoSinTipoDoc = nombreArchivoString.substring(0,indexTipoArchivo); // nombre solo de archivo
+        String tipoArchivo = nombreArchivoString.substring(indexTipoArchivo); // me da el tipo de archivo
+        String nuevoNombre = nombreArchivoSinTipoDoc + "Encriptado" + tipoArchivo; // le doy un nuevo nombre al archivo
+
+        Path nuevoPath = padreDirectorio.resolve(nuevoNombre); // creo el nuevo directorio adicionano el nuevo nombre del nuevo archivo
+        crearArchivo(nuevoPath); //** la comento porque ahorita no quiero que me cree ningún documento
+        return nuevoPath;
+    }
+
+    //FALTA SER MÁS DETALLADO EN LAS EXCEPCIONES ACÁ
+    public void escribirArchivo(String texto){
         // Escribe contenido en el archivo
-        Files.writeString(path, "la prueba pasó, se escribió\n", StandardOpenOption.APPEND);
+        Path direccion = crearDireccionEncriptado();
+        try {
+            Files.writeString(direccion/*path*/, texto, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            throw new RuntimeException("Hubo un error al escribir en el archivo"+e);
+        }
         System.out.println("Contenido escrito en el archivo.");
-        */
+    }
+
+     public void cambiadorTexto(String camino, int desplazamiento, String idioma) {
+         // Define la ruta del archivo "c:/Usuarios/77593/Documentos/readme.txt"
+         super.setDesplazamiento(desplazamiento);
+         super.conversor(idioma);
+         this.camino=camino;
+         path = Path.of(camino);// pongo el camino que nos interesa usar
 
         // Lee el contenido del archivo y lo muestra
-        List<String> list = Files.readAllLines(path);
-        for (String str : list) {
+         List<String> list;
+         try {
+             list = Files.readAllLines(path);
+         } catch (IOException e) {
+             throw new RuntimeException("Error al leer el archivo"+e);
+         }
+
+         for (String str : list) {
             for(int i=0 ; i<str.length() ; i++) {
                 char letrita = str.charAt(i); // convierto el string a char
                 // aquí haces la conversion si alguna de las letras coinside con el vocabulario que usamos
@@ -59,14 +111,13 @@ public class Archivos extends Letras{
                 stringBuilder.append(letrita);
             }
         }
-         return stringBuilder;
+         //convierto el StringBuilder a String para que escribir archivo cree otro documento
+         String nuevoDoc = stringBuilder.toString();
+         escribirArchivo(nuevoDoc);
      }
 
      // ZONA DE PRUEBAS ***SE VA A ELIMINAR****
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Archivos archivos = new Archivos();
-        //System.out.println(archivos.trabajarArchivo()); // Muestra el stringBuilder de la funcion (la encriptacion)
-        //System.out.println(archivos.getLetrasConvertidas()); // me da el abecedario desplazado
-        //System.out.println(LETRASESPAÑOL); // me da el abecedario real
     }
 }
