@@ -1,5 +1,7 @@
 package EntradasSalidas;
 
+import Exepciones.RutaNoExistente;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,23 +71,39 @@ public class Archivos extends Letras{
     }
 
     //FALTA SER MÁS DETALLADO EN LAS EXCEPCIONES ACÁ
-    public void escribirArchivo(String texto){
+    public void escribirArchivo(String texto, Path direccion){
         // Escribe contenido en el archivo
-        Path direccion = crearDireccionEncriptado();
         try {
-            Files.writeString(direccion/*path*/, texto, StandardOpenOption.APPEND);
+            Files.writeString(direccion, texto, StandardOpenOption.APPEND);
         } catch (IOException e) {
             throw new RuntimeException("Hubo un error al escribir en el archivo"+e);
         }
         System.out.println("Contenido escrito en el archivo.");
     }
 
-     public void cambiadorTexto(String camino, int desplazamiento, String idioma) {
-         // Define la ruta del archivo "c:/Usuarios/77593/Documentos/readme.txt"
-         super.setDesplazamiento(desplazamiento);
+     public void cambiadorTexto(String camino, String desplazamiento, String idioma) {
+         //hago una conversion en la que me permite pasar lo que no sea un número con un string en blanco, esto me
+         // permite que escriba lo que escriba el usuario siempre tenga algún desplazamiento, el problema es que si
+         // ponen varios números se hará el desplazamiento de todos los números que pongan
+         String desplazar = desplazamiento.replaceAll("\\D", "");
+         int desplazarInt = Integer.parseInt(desplazar);
+
+         super.setDesplazamiento(desplazarInt);
          super.conversor(idioma);
+
          this.camino=camino;
-         path = Path.of(camino);// pongo el camino que nos interesa usar
+         this.path = Path.of(camino);// pongo el camino que nos interesa usar
+         if(!Files.exists(path))
+             throw new RuntimeException("La ruta no existe, rectifica la ruta o creala en el menu");
+
+         char [] idiomaLista;
+         if(idioma.toLowerCase().contains("español")){
+             idiomaLista = LETRASESPAÑOL;
+         } else if(idioma.toLowerCase().contains("ingles")){
+             idiomaLista = LETRASINGLES;
+         } else {
+             throw new RutaNoExistente();
+         }
 
         // Lee el contenido del archivo y lo muestra
          List<String> list;
@@ -99,9 +117,9 @@ public class Archivos extends Letras{
             for(int i=0 ; i<str.length() ; i++) {
                 char letrita = str.charAt(i); // convierto el string a char
                 // aquí haces la conversion si alguna de las letras coinside con el vocabulario que usamos
-                for (int j = 0; j < LETRASESPAÑOL.length; j++) {
+                for (int j = 0; j < idiomaLista.length; j++) {
                     //aquí checa si la latra pertenece al abecedario, sino lo manda por un tubo
-                    if (letrita == LETRASESPAÑOL[j]) {
+                    if (letrita == idiomaLista[j]) {
                         char[] cambioChar = super.getLetrasConvertidas(); // Traigo el vocabulario con los desplazamientos
                         letrita = cambioChar[j];
                         break; // ESTE BREAK ES NECESARIO PORQUE CUANDO SE CUMPLE LA CONDICION YA NO SIGUE SOBREPENSANDO
@@ -113,11 +131,8 @@ public class Archivos extends Letras{
         }
          //convierto el StringBuilder a String para que escribir archivo cree otro documento
          String nuevoDoc = stringBuilder.toString();
-         escribirArchivo(nuevoDoc);
+         // saco la direccion del archivo encriptado para enviarla a "escribirArchivo"
+         Path direccion = crearDireccionEncriptado();
+         escribirArchivo(nuevoDoc, direccion);
      }
-
-     // ZONA DE PRUEBAS ***SE VA A ELIMINAR****
-    public static void main(String[] args) {
-        Archivos archivos = new Archivos();
-    }
 }

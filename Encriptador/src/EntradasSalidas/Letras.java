@@ -25,10 +25,10 @@ public class Letras {
 
     public void conversor(String selector) {
         String TEXTOERROR = "Lo ingresado no está en nuestro catálogo, por favor ingresa algo de nuestro sistema";
-        if (selector.toLowerCase().contains("español") || selector.toLowerCase().contains("spanish")) {
+        if (selector.toLowerCase().contains("español")) {
             letrasConvertidas = new char[LETRASESPAÑOL.length];
             moviemiento(LETRASESPAÑOL);
-        } else if (selector.toLowerCase().contains("english") || selector.toLowerCase().contains("ingles")) {
+        } else if (selector.toLowerCase().contains("english")) {
             letrasConvertidas = new char[LETRASINGLES.length];
             moviemiento(LETRASINGLES);
         } else System.out.println(TEXTOERROR);
